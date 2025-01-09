@@ -1,0 +1,148 @@
+package simple;
+import java.sql.*;
+
+public class Mysqlconnection {
+
+private static final String URL = "jdbc:mysql://localhost:3306/";
+private static final String USER = "root"; // Replace with your MySQL username
+private static final String PASSWORD = "root"; // Replace with your MySQL password
+
+public static void main(String[] args) {
+try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+System.out.println("Connected to MySQL database!");
+
+// Create Database
+createDatabase(connection, "SimpleDB");
+
+// Use the database
+try (Statement statement = connection.createStatement()) {
+statement.execute("USE SimpleDB");
+}
+
+// Create Table
+createTable(connection);
+
+// Insert Data
+System.out.println("\nInserting Data:");
+insertData(connection, "Alice", 25);
+insertData(connection, "Bob", 30);
+
+// Display Data
+System.out.println("\nUsers Table Data:");
+displayData(connection);
+
+// Update Data
+System.out.println("\nUpdating Data:");
+updateData(connection, 1, "Alice Updated");
+System.out.println("Users Table Data:");
+displayData(connection);
+
+// Delete Data
+/**System.out.println("\nDeleting Data:");
+deleteData(connection, 2);
+System.out.println("Users Table Data:");
+displayData(connection);**/
+
+// Clear Table
+/**System.out.println("\nClearing Table:");
+clearTable(connection);
+System.out.println("Users Table Data:");
+displayData(connection);**/
+
+} catch (SQLException e) {
+e.printStackTrace();
+	        }
+	    }
+
+	    // Create Database
+private static void createDatabase(Connection connection, String dbName) throws SQLException {
+	        try (Statement statement = connection.createStatement()) {
+	            statement.execute("CREATE DATABASE IF NOT EXISTS " + dbName);
+	            System.out.println("Database " + dbName + " created!");
+	        }
+	    }
+
+	    // Create Table
+	    private static void createTable(Connection connection) throws SQLException {
+	        String createTableSQL = """
+	                CREATE TABLE IF NOT EXISTS Users (
+	                    id INT AUTO_INCREMENT PRIMARY KEY,
+	                    name VARCHAR(100) NOT NULL,
+	                    age INT NOT NULL
+	                )
+	                """;
+
+	        try (Statement statement = connection.createStatement()) {
+	            statement.execute(createTableSQL);
+	            System.out.println("Table 'Users' created!");
+	        }
+	    }
+
+	    // Insert Data
+private static void insertData(Connection connection, String name, int age) throws SQLException {
+	        String insertSQL = "INSERT INTO Users (name, age) VALUES (?, ?)";
+	        System.out.println("Inserting: Name=" + name + ", Age=" + age);
+
+	        try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+	            preparedStatement.setString(1, name);
+	            preparedStatement.setInt(2, age);
+	            preparedStatement.executeUpdate();
+	            System.out.println("Inserted: " + name + ", Age: " + age);
+	        }
+	    }
+
+	    // Display Data
+	    private static void displayData(Connection connection) throws SQLException {
+	        String querySQL = "SELECT * FROM Users";
+
+	        try (Statement statement = connection.createStatement();
+	             ResultSet resultSet = statement.executeQuery(querySQL)) {
+
+	            if (!resultSet.isBeforeFirst()) {
+	                System.out.println("No data found.");
+	                return;
+	            }
+
+	            while (resultSet.next()) {
+	            	int id = resultSet.getInt("id");
+	                String name = resultSet.getString("name");
+	                int age = resultSet.getInt("age");
+
+	                System.out.println("ID: " + id + ", Name: " + name + ", Age: " + age);
+	            }
+	        }
+	    }
+
+	    // Update Data
+private static void updateData(Connection connection, int id, String newName) throws SQLException {
+	        String updateSQL = "UPDATE Users SET name = ? WHERE id = ?";
+	  try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+	            preparedStatement.setString(1, newName);
+	            preparedStatement.setInt(2, id);
+	            preparedStatement.executeUpdate();
+	            System.out.println("Updated User ID: " + id + " to Name: " + newName);
+	        }
+	    }
+
+	    // Delete Data
+/** private static void deleteData(Connection connection, int id) throws SQLException {
+	        String deleteSQL = "DELETE FROM Users WHERE id = ?";
+	  try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+	            preparedStatement.setInt(1, id);
+	            preparedStatement.executeUpdate();
+	            System.out.println("Deleted User ID: " + id);
+	        }
+	    }
+
+	    // Clear Table
+	    private static void clearTable(Connection connection) throws SQLException {
+	        String clearSQL = "TRUNCATE TABLE Users";
+	        try (Statement statement = connection.createStatement()) {
+	            statement.execute(clearSQL);
+	            System.out.println("Table 'Users' cleared!");
+	        }
+	    }**/
+	            }
+		    
+		
+	
